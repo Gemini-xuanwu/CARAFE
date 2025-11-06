@@ -124,7 +124,9 @@ class CARAFEFunction(Function):
 
     @staticmethod
     def backward(ctx, grad_output):
-        assert grad_output.is_cuda
+        # 在导出 ONNX 时，不需要 backward
+        if torch.onnx.is_in_onnx_export() or not grad_output.is_cuda:
+            return None, None, None, None, None
 
         features, masks, rfeatures = ctx.saved_tensors
         kernel_size = ctx.kernel_size
